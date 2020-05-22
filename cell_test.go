@@ -107,6 +107,20 @@ func TestGetCellFormula(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestGetRawCellValue(t *testing.T) {
+	f, err := OpenFile(filepath.Join("test", "TestGetRawCellValue.xlsx"))
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	val, err := f.GetRawCellValue("Sheet1", "A1")
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	assert.Equal(t, "1.5", val)
+}
+
 func ExampleFile_SetCellFloat() {
 	f := NewFile()
 	var x = 3.14159265

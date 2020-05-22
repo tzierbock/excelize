@@ -298,27 +298,39 @@ func (f *File) sharedStringsReader() *xlsxSST {
 
 // getValueFrom return a value from a column/row cell, this function is
 // inteded to be used with for range on rows an argument with the xlsx opened
-// file.
+// file. If possible, formatting is applied to the cell value.
 func (xlsx *xlsxC) getValueFrom(f *File, d *xlsxSST) (string, error) {
+	val, err := xlsx.getRawValueFrom(f, d)
+	if err != nil {
+		return val, err
+	}
+
+	return f.formattedValue(xlsx.S, val), nil
+}
+
+// getRawValueFrom return a value from a column/row cell, this function is
+// inteded to be used with for range on rows an argument with the xlsx opened
+// file.
+func (xlsx *xlsxC) getRawValueFrom(f *File, d *xlsxSST) (string, error) {
 	switch xlsx.T {
 	case "s":
 		if xlsx.V != "" {
 			xlsxSI := 0
 			xlsxSI, _ = strconv.Atoi(xlsx.V)
 			if len(d.SI) > xlsxSI {
-				return f.formattedValue(xlsx.S, d.SI[xlsxSI].String()), nil
+				return d.SI[xlsxSI].String(), nil
 			}
 		}
-		return f.formattedValue(xlsx.S, xlsx.V), nil
+		return xlsx.V, nil
 	case "str":
-		return f.formattedValue(xlsx.S, xlsx.V), nil
+		return xlsx.V, nil
 	case "inlineStr":
 		if xlsx.IS != nil {
-			return f.formattedValue(xlsx.S, xlsx.IS.String()), nil
+			return xlsx.IS.String(), nil
 		}
-		return f.formattedValue(xlsx.S, xlsx.V), nil
+		return xlsx.V, nil
 	default:
-		return f.formattedValue(xlsx.S, xlsx.V), nil
+		return xlsx.V, nil
 	}
 }
 

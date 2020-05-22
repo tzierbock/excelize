@@ -44,6 +44,18 @@ func (f *File) GetCellValue(sheet, axis string) (string, error) {
 	})
 }
 
+// GetRawCellValue provides a function to get raw value from cell by given
+// worksheet name and axis in XLSX file.
+func (f *File) GetRawCellValue(sheet, axis string) (string, error) {
+	return f.getCellStringFunc(sheet, axis, func(x *xlsxWorksheet, c *xlsxC) (string, bool, error) {
+		val, err := c.getRawValueFrom(f, f.sharedStringsReader())
+		if err != nil {
+			return val, false, err
+		}
+		return val, true, err
+	})
+}
+
 // SetCellValue provides a function to set value of a cell. The specified
 // coordinates should not be in the first row of the table. The following
 // shows the supported data types:
